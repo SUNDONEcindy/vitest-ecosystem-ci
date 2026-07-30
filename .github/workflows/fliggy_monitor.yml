@@ -1,0 +1,23 @@
+name: 椋炵尓11鏉″晢鍝侀摼鎺ュ贰妫€
+on:
+  schedule:
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  fliggy-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: 椋炵尓鍟嗗搧閾炬帴宸℃
+        run: node fliggy_monitor.mjs
+      - name: 褰掓。宸℃缁撴灉
+        uses: actions/upload-artifact@v4
+        with:
+          name: fliggy-report
+          path: fliggy_monitor_report.json
