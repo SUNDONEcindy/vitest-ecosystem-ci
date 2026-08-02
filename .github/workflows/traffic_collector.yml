@@ -1,0 +1,101 @@
+name: "Traffic Collector v2.0"
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: traffic-collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests --quiet
+      - name: Collect Traffic Data
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          python3 << 'PYEOF'
+          import requests, json, time, os, hashlib
+
+          TARGETS = [
+              "https://market.fliggy.com/item.htm?id=1061217153671",
+              "https://market.fliggy.com/item.htm?id=1061810629923",
+              "https://market.fliggy.com/item.htm?id=1059798887756",
+              "https://market.fliggy.com/item.htm?id=1051443785486",
+              "https://market.fliggy.com/item.htm?id=1060285671386",
+              "https://market.fliggy.com/item.htm?id=1056343383874",
+              "https://market.fliggy.com/item.htm?id=1059036808911",
+              "https://market.fliggy.com/item.htm?id=1045285536976",
+              "https://market.fliggy.com/item.htm?id=1060214802605",
+              "https://market.fliggy.com/item.htm?id=1055272192360",
+              "https://market.fliggy.com/item.htm?id=1057028184538",
+          ]
+
+          UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+          repo = os.environ.get("REPO_NAME", "unknown")
+          run_id = os.environ.get("RUN_ID", "0")
+          run_num = os.environ.get("RUN_NUMBER", "0")
+          ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+          results = {
+              "repo": repo,
+              "run_id": run_id,
+              "run_number": run_num,
+              "timestamp": ts,
+              "source": "github-actions",
+              "targets": []
+          }
+
+          session = requests.Session()
+          session.headers.update({"User-Agent": UA})
+
+          for url in TARGETS:
+              entry = {"url": url, "item_id": url.split("id=")[-1]}
+              try:
+                  start = time.time()
+                  resp = session.get(url, timeout=20, allow_redirects=True)
+                  elapsed = time.time() - start
+                  entry["status"] = resp.status_code
+                  entry["elapsed_ms"] = int(elapsed * 1000)
+                  entry["content_len"] = len(resp.text or "")
+                  entry["final_url"] = resp.url[:200]
+                  entry["redirects"] = len(resp.history)
+                  entry["ok"] = True
+              except Exception as e:
+                  entry["status"] = 0
+                  entry["elapsed_ms"] = 0
+                  entry["error"] = str(e)[:200]
+                  entry["ok"] = False
+              results["targets"].append(entry)
+
+          ok_count = sum(1 for t in results["targets"] if t.get("ok"))
+          print("Round %s: %d/%d OK" % (run_num, ok_count, len(TARGETS)))
+
+          os.makedirs("traffic_events", exist_ok=True)
+          fname = "traffic_events/%s_%s.json" % (ts.replace(":","-").replace("T","_")[:19], run_id[:8])
+          with open(fname, "w") as f:
+              json.dump(results, f, indent=2, ensure_ascii=False)
+          
+          PYEOF
+      - name: Commit Results
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "traffic: round ${{ github.run_number }} [${{ github.run_id }}]"
+          file_pattern: "traffic_events/*.json"
+          commit_user_name: "TrafficBot"
+          commit_user_email: "traffic@sundone.cloud"
