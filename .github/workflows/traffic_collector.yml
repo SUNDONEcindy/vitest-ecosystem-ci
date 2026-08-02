@@ -1,4 +1,4 @@
-name: "Traffic Collector v3.0"
+name: "Traffic Collector v4.0"
 
 on:
   schedule:
@@ -30,7 +30,7 @@ jobs:
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           python3 << 'PYEOF'
-          import requests, json, time, os, hashlib
+          import requests, json, time, os
 
           TARGETS = [
               "https://market.fliggy.com/item.htm?id=1061217153671",
@@ -52,14 +52,8 @@ jobs:
           run_num = os.environ.get("RUN_NUMBER", "0")
           ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
-          results = {
-              "repo": repo,
-              "run_id": run_id,
-              "run_number": run_num,
-              "timestamp": ts,
-              "source": "github-actions",
-              "targets": []
-          }
+          results = {"repo": repo, "run_id": run_id, "run_number": run_num,
+                     "timestamp": ts, "source": "github-actions", "targets": []}
 
           session = requests.Session()
           session.headers.update({"User-Agent": UA})
@@ -69,9 +63,8 @@ jobs:
               try:
                   start = time.time()
                   resp = session.get(url, timeout=20, allow_redirects=True)
-                  elapsed = time.time() - start
                   entry["status"] = resp.status_code
-                  entry["elapsed_ms"] = int(elapsed * 1000)
+                  entry["elapsed_ms"] = int((time.time() - start) * 1000)
                   entry["content_len"] = len(resp.text or "")
                   entry["final_url"] = resp.url[:200]
                   entry["redirects"] = len(resp.history)
@@ -88,10 +81,8 @@ jobs:
 
           os.makedirs("traffic_events", exist_ok=True)
           safe_ts = ts.replace(":", "-").replace("T", "_")[:19]
-          fname = "traffic_events/%s_%s.json" % (safe_ts, run_id[:8])
-          with open(fname, "w") as f:
+          with open("traffic_events/%s_%s.json" % (safe_ts, run_id[:8]), "w") as f:
               json.dump(results, f, indent=2, ensure_ascii=False)
-
           PYEOF
       - name: Commit and Push
         env:
@@ -100,14 +91,11 @@ jobs:
         run: |
           git config user.name "TrafficBot"
           git config user.email "traffic@sundone.cloud"
-
           git add traffic_events/*.json
-
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
-
           git commit -m "traffic: round ${RUN_NUMBER} [${RUN_ID}]"
-          git pull --rebase origin HEAD
-          git push origin HEAD
+          git pull --rebase --autostash origin HEAD 2>/dev/null || echo "rebase skipped"
+          git push origin HEAD 2>/dev/null || echo "push skipped (will retry next round)"
