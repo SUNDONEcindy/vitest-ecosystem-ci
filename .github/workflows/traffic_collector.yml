@@ -1,4 +1,4 @@
-name: "Traffic Collector v2.0"
+name: "Traffic Collector v3.0"
 
 on:
   schedule:
@@ -87,15 +87,27 @@ jobs:
           print("Round %s: %d/%d OK" % (run_num, ok_count, len(TARGETS)))
 
           os.makedirs("traffic_events", exist_ok=True)
-          fname = "traffic_events/%s_%s.json" % (ts.replace(":","-").replace("T","_")[:19], run_id[:8])
+          safe_ts = ts.replace(":", "-").replace("T", "_")[:19]
+          fname = "traffic_events/%s_%s.json" % (safe_ts, run_id[:8])
           with open(fname, "w") as f:
               json.dump(results, f, indent=2, ensure_ascii=False)
-          
+
           PYEOF
-      - name: Commit Results
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "traffic: round ${{ github.run_number }} [${{ github.run_id }}]"
-          file_pattern: "traffic_events/*.json"
-          commit_user_name: "TrafficBot"
-          commit_user_email: "traffic@sundone.cloud"
+      - name: Commit and Push
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          git config user.name "TrafficBot"
+          git config user.email "traffic@sundone.cloud"
+
+          git add traffic_events/*.json
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "traffic: round ${RUN_NUMBER} [${RUN_ID}]"
+          git pull --rebase origin HEAD
+          git push origin HEAD
