@@ -1,0 +1,119 @@
+{
+  "repo": "vitest-ecosystem-ci",
+  "run_id": "30933576450",
+  "run_number": "31",
+  "timestamp": "2026-08-04T17:27:35Z",
+  "source": "github-actions",
+  "targets": [
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1061217153671",
+      "item_id": "1061217153671",
+      "status": 404,
+      "elapsed_ms": 606,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1061217153671",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1061810629923",
+      "item_id": "1061810629923",
+      "status": 404,
+      "elapsed_ms": 41,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1061810629923",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1059798887756",
+      "item_id": "1059798887756",
+      "status": 404,
+      "elapsed_ms": 36,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1059798887756",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1051443785486",
+      "item_id": "1051443785486",
+      "status": 404,
+      "elapsed_ms": 36,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1051443785486",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1060285671386",
+      "item_id": "1060285671386",
+      "status": 404,
+      "elapsed_ms": 38,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1060285671386",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1056343383874",
+      "item_id": "1056343383874",
+      "status": 404,
+      "elapsed_ms": 36,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1056343383874",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1059036808911",
+      "item_id": "1059036808911",
+      "status": 404,
+      "elapsed_ms": 36,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1059036808911",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1045285536976",
+      "item_id": "1045285536976",
+      "status": 404,
+      "elapsed_ms": 36,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1045285536976",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1060214802605",
+      "item_id": "1060214802605",
+      "status": 404,
+      "elapsed_ms": 36,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1060214802605",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1055272192360",
+      "item_id": "1055272192360",
+      "status": 404,
+      "elapsed_ms": 37,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1055272192360",
+      "redirects": 0,
+      "ok": true
+    },
+    {
+      "url": "https://market.fliggy.com/item.htm?id=1057028184538",
+      "item_id": "1057028184538",
+      "status": 404,
+      "elapsed_ms": 36,
+      "content_len": 22,
+      "final_url": "https://market.fliggy.com/item.htm?id=1057028184538",
+      "redirects": 0,
+      "ok": true
+    }
+  ]
+}
